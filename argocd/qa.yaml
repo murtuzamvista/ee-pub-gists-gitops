@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ee-pub-gists-qa
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/murtuzamvista/ee-pub-gists-gitops.git
+    targetRevision: main
+    path: overlays/qa
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ee-pub-gists-qa
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
