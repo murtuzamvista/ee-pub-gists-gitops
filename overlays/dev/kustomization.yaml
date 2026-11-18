@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ee-pub-gists-dev
+
+resources:
+  - ../../base
+  - namespace.yaml
+
+images:
+  - name: murtaza1983/ee-pub-gists
+    newTag: sha-REPLACE_WITH_DEV_COMMIT_SHA
+
+replicas:
+  - name: ee-pub-gists
+    count: 1
