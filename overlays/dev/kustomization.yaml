@@ -9,7 +9,7 @@ resources:
 
 images:
   - name: murtaza1983/ee-pub-gists
-    newTag: sha-REPLACE_WITH_DEV_COMMIT_SHA
+    newTag: sha-ad88602d15607d79c35ccee8b00a807a5282e9db
 
 replicas:
   - name: ee-pub-gists
