@@ -1,21 +1,22 @@
 # ee-pub-gists GitOps deployment
 
-This repository contains a shared Kustomize base, QA and production overlays,
-and Argo CD `Application` manifests for the `murtaza1983/ee-pub-gists` image.
+This repository contains a shared Kustomize base, dev, QA, and production
+overlays, and Argo CD `Application` manifests for the
+`murtaza1983/ee-pub-gists` image.
 
-## Promote an image
+## Deploy and promote an image
 
-The workflow publishes candidate images to Docker Hub using the
-`sha-<full Git commit SHA>` tag. Set `newTag` in `overlays/qa/kustomization.yaml`
-to the tag for the candidate commit. After QA approval, set
-`overlays/production/kustomization.yaml` to that same SHA tag. This promotes
-the exact tested image instead of rebuilding it.
+On each successful push to the application's `develop` branch, its dev pipeline
+builds and scans the image, publishes it to Docker Hub using the
+`sha-<full Git commit SHA>` tag, and updates
+`overlays/dev/kustomization.yaml` to that tag. The dev, QA, and production
+overlays should use the same SHA tag when promoting an image, so each
+environment runs the exact same tested image instead of rebuilding it.
 
-The workflow also publishes a `vMAJOR.MINOR.PATCH` alias for release tags; use
-the SHA tag for deployments to ensure both environments refer to the same image.
-The base contains shared deployment and service settings. The QA overlay runs
-one replica with the base resource requests and limits. Production runs two
-replicas and uses higher resource requests and limits.
+QA and production promotion are performed separately after their respective
+approvals. The base contains shared deployment and service settings. The dev
+and QA overlays run one replica with the base resource requests and limits.
+Production runs two replicas and uses higher resource requests and limits.
 
 ## Configure Argo CD
 
@@ -24,20 +25,22 @@ branch. Update those values if the repository or deployment branch differs.
 Apply each Application to the cluster where Argo CD is installed:
 
 ```sh
+kubectl apply -f argocd/dev.yaml
 kubectl apply -f argocd/qa.yaml
 kubectl apply -f argocd/production.yaml
 ```
 
-Each application syncs its overlay into its own namespace
-(`ee-pub-gists-qa` or `ee-pub-gists-production`). The deployment listens on
+Each application syncs its overlay into its own namespace (`ee-pub-gists-dev`,
+`ee-pub-gists-qa`, or `ee-pub-gists-production`). The deployment listens on
 port `8080`; its `ClusterIP` service is also available on port `8080`. Startup
 and liveness probes use `/health/live`; readiness uses `/health/ready`, which
-reports ready only after the application has initialized its GitHub API client.
-These checks do not make requests to GitHub.
+reports ready only after the application has initialized its GitHub API
+client. These checks do not make requests to GitHub.
 
 ## Render overlays locally
 
 ```sh
+kubectl kustomize overlays/dev
 kubectl kustomize overlays/qa
 kubectl kustomize overlays/production
 ```
