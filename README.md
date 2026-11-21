@@ -16,14 +16,16 @@ environment runs the exact same tested image instead of rebuilding it.
 QA and production promotion are performed separately after their respective
 approvals. The base contains shared deployment and service settings. The dev
 and QA overlays run one replica with the base resource requests and limits.
-Production runs two replicas and uses higher resource requests and limits.
+Production runs two replicas and uses higher resource requests and limits. The
+overlays deploy into the `dev`, `qa`, and `production` namespaces, respectively.
 
 ## Configure Argo CD
 
 The dev Argo CD `Application` is managed by Terraform in the
-`ee-pub-gists-terraform/argocd-applications` root, which points to this repository's
-`main` branch and `overlays/dev`. Apply the Terraform root only after Argo CD
-has been installed and the dev overlay has a valid published image tag.
+`ee-pub-gists-terraform/terraform/apps` root, which points to
+this repository's `main` branch and `overlays/dev`. Apply the Terraform root
+only after Argo CD has been installed and the dev overlay has a valid published
+image tag.
 
 QA and production Application definitions remain in `argocd/` for the
 forthcoming promotion workflows; they are not managed by the dev Terraform

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ee-pub-gists-qa
+  name: ee-pub-gists
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -13,7 +13,7 @@ spec:
     path: overlays/qa
   destination:
     server: https://kubernetes.default.svc
-    namespace: ee-pub-gists-qa
+    namespace: qa
   syncPolicy:
     automated:
       prune: true
