@@ -12,7 +12,7 @@ done
 
 yamllint --strict --config-file "$repo_root/.yamllint" "$repo_root"
 
-for overlay in qa production; do
+for overlay in dev qa production; do
   printf 'Rendering and schema-validating %s overlay...\n' "$overlay"
   kubectl kustomize "$repo_root/overlays/$overlay" |
     kubeconform -strict -summary

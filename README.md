@@ -20,22 +20,18 @@ Production runs two replicas and uses higher resource requests and limits.
 
 ## Configure Argo CD
 
-The Argo CD manifests point to this repository's configured URL and `main`
-branch. Update those values if the repository or deployment branch differs.
-Apply each Application to the cluster where Argo CD is installed:
+The dev Argo CD `Application` is managed by Terraform in the
+`ee-pub-gists-terraform/argocd-applications` root, which points to this repository's
+`main` branch and `overlays/dev`. Apply the Terraform root only after Argo CD
+has been installed and the dev overlay has a valid published image tag.
 
-```sh
-kubectl apply -f argocd/dev.yaml
-kubectl apply -f argocd/qa.yaml
-kubectl apply -f argocd/production.yaml
-```
-
-Each application syncs its overlay into its own namespace (`ee-pub-gists-dev`,
-`ee-pub-gists-qa`, or `ee-pub-gists-production`). The deployment listens on
-port `8080`; its `ClusterIP` service is also available on port `8080`. Startup
-and liveness probes use `/health/live`; readiness uses `/health/ready`, which
-reports ready only after the application has initialized its GitHub API
-client. These checks do not make requests to GitHub.
+QA and production Application definitions remain in `argocd/` for the
+forthcoming promotion workflows; they are not managed by the dev Terraform
+root. The dev deployment listens on port `8080`; its `ClusterIP` service is
+also available on port `8080`. Startup and liveness probes use `/health/live`;
+readiness uses `/health/ready`, which reports ready only after the application
+has initialized its GitHub API client. These checks do not make requests to
+GitHub.
 
 ## Render overlays locally
 
@@ -47,8 +43,9 @@ kubectl kustomize overlays/production
 
 ## Lint and validate changes
 
-The GitHub Actions workflow lints all YAML files and renders both Kustomize
-overlays, validating the rendered Kubernetes resources against their schemas.
+The GitHub Actions workflow lints all YAML files and renders the dev, QA, and
+production Kustomize overlays, validating the rendered Kubernetes resources
+against their schemas.
 Configure this workflow's **Lint and validate manifests** check as required in
 branch protection or a ruleset to block merging changes that fail validation.
 GitHub Actions runs on pushes but cannot prevent a direct push by itself.
